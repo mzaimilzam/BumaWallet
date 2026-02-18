@@ -35,7 +35,7 @@ extension TransactionX on Transaction {
 TransactionStatus _statusFromString(String value) {
   return switch (value.toLowerCase()) {
     'pending' => TransactionStatus.pending,
-    'success' => TransactionStatus.success,
+    'completed' => TransactionStatus.success,
     'failed' => TransactionStatus.failed,
     'pending_sync' => TransactionStatus.pendingSync,
     _ => TransactionStatus.failed,
@@ -46,7 +46,7 @@ TransactionStatus _statusFromString(String value) {
 String _statusToString(TransactionStatus status) {
   return switch (status) {
     TransactionStatus.pending => 'pending',
-    TransactionStatus.success => 'success',
+    TransactionStatus.success => 'completed',
     TransactionStatus.failed => 'failed',
     TransactionStatus.pendingSync => 'pending_sync',
   };

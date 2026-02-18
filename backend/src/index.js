@@ -228,10 +228,30 @@ app.get('/wallet/balance', verifyToken, async (req, res) => {
 app.post('/wallet/transfer', verifyToken, async (req, res) => {
     const client = await pool.connect();
     try {
-        const { recipientEmail, amount } = req.body;
+        const { recipientEmail, amount, transactionId: requestTransactionId } = req.body;
 
         if (!recipientEmail || !amount || amount <= 0) {
             return res.status(400).json({ message: 'Invalid recipient or amount' });
+        }
+
+        if (requestTransactionId) {
+            const existingTransaction = await client.query(
+                'SELECT id, amount, recipient_email, status FROM transactions WHERE id = $1 AND user_id = $2',
+                [requestTransactionId, req.user.userId]
+            );
+
+            if (existingTransaction.rows.length > 0) {
+                const existing = existingTransaction.rows[0];
+                return res.status(200).json({
+                    message: 'Transfer already processed',
+                    transaction: {
+                        id: existing.id,
+                        amount: parseFloat(existing.amount),
+                        recipientEmail: existing.recipient_email,
+                        status: (existing.status || '').toLowerCase()
+                    }
+                });
+            }
         }
 
         await client.query('BEGIN');
@@ -274,10 +294,10 @@ app.post('/wallet/transfer', verifyToken, async (req, res) => {
         await client.query('UPDATE wallets SET balance = balance + $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [amount, recipientWallet.rows[0].id]);
 
         // Create transaction record
-        const transactionId = uuidv4();
+        const transactionId = requestTransactionId || uuidv4();
         await client.query(
-            'INSERT INTO transactions (id, wallet_id, recipient_email, amount, transaction_type, status) VALUES ($1, $2, $3, $4, $5, $6)',
-            [transactionId, senderWallet.rows[0].id, recipientEmail, amount, 'transfer', 'completed']
+            'INSERT INTO transactions (id, wallet_id, user_id, recipient_email, amount, note, transaction_type, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+            [transactionId, senderWallet.rows[0].id, req.user.userId, recipientEmail, amount, req.body.note ?? null, 'transfer', 'completed']
         );
 
         await client.query('COMMIT');

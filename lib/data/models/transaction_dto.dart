@@ -15,14 +15,14 @@ class TransferRequestDto with _$TransferRequestDto {
 
   factory TransferRequestDto.fromJson(Map<String, dynamic> json) {
     return TransferRequestDto(
-      recipientEmail: json['recipient_email'] as String,
+      recipientEmail: json['recipientEmail'] as String,
       amount: (json['amount'] as num).toDouble(),
       note: json['note'] as String,
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'recipient_email': recipientEmail,
+        'recipientEmail': recipientEmail,
         'amount': amount,
         'note': note,
       };

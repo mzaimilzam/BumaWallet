@@ -238,7 +238,7 @@ class WalletRepositoryImpl implements WalletRepository {
   /// In production, use connectivity_plus or similar package
   Future<bool> _isOnline() async {
     // TODO: Implement actual connectivity check using connectivity_plus
-    return true; // Placeholder
+    return false; // Placeholder
   }
 
   String _statusToString(TransactionStatus status) {

@@ -269,6 +269,35 @@ class _HistoryTabScreenState extends State<HistoryTabScreen> {
                     ),
               ),
             ],
+            if (transaction.status == TransactionStatus.pending ||
+                transaction.status == TransactionStatus.pendingSync) ...[
+              const SizedBox(height: 12),
+              Align(
+                alignment: Alignment.centerRight,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    // context.read<WalletBloc>().add(
+                    //       TransferRequested(
+                    //         recipientEmail: transaction.recipientEmail,
+                    //         amount: transaction.amount,
+                    //         note: transaction.note,
+                    //       ),R
+                    //     );
+                    // context
+                    //     .read<WalletBloc>()
+                    //     .add(SyncTransactionRequested(transaction.id));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Sync feature under development'),
+                        backgroundColor: Colors.orange,
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.sync, size: 18),
+                  label: const Text('Sync'),
+                ),
+              ),
+            ],
           ],
         ),
       ),
